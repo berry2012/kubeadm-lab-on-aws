@@ -1,0 +1,139 @@
+- hosts: k8s
+  become: true
+  become_user: root
+  gather_facts: true
+
+  vars:
+    location: "/home/ubuntu"
+
+  tasks:
+    - name: Setting HOSTNAME as fact
+      set_fact:
+        HOSTNAME: "{{ 'controller' if inventory_hostname == 'controller1' else 'worker1' if inventory_hostname == 'worker1' else 'worker2' if inventory_hostname == 'worker2' else 'UNKNOWN' }}"
+
+    - name: Prints HOSTNAME variable set
+      debug:
+        msg:
+        - "This machine HOSTNAME is: '{{ HOSTNAME }}'" 
+
+    - name: set hostname
+      shell: "sudo hostnamectl set-hostname k8s-{{ HOSTNAME }}"
+
+    - name: reboot
+      reboot:
+
+    - pause:
+        seconds: 30  
+
+    - name: copy artefacts to nodes 
+      copy: 
+        src: "{{ location }}/setup.sh"
+        dest: "{{ location }}/setup.sh"
+        owner: ubuntu
+        group: ubuntu  
+
+    - name: Make setup script executable
+      shell: "chmod +x {{location}}/setup.sh"
+
+    - name: Execute the command in remote shell; stdout goes to the specified file on the remote
+      shell: "{{location}}/setup.sh >> {{location}}/setup_output.txt"
+
+- hosts: localhost
+  become: true
+  become_user: root
+  gather_facts: true
+
+  tasks:
+
+    - name: Run on Controller
+      block:
+        - name: Initialize the cluster
+          shell: sudo kubeadm init --pod-network-cidr 192.168.0.0/16
+
+        - name: Set kubectl access
+          shell: |
+            mkdir -p $HOME/.kube
+            sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+            sudo chown $(id -u):$(id -g) $HOME/.kube/config
+            sudo cp /etc/kubernetes/admin.conf /home/ubuntu/config
+            sudo chown ubuntu:ubuntu /home/ubuntu/config     
+
+            exit 0
+
+        - name: Set kubectl access Test access to cluster
+          shell: kubectl version
+          register: kubectl_version
+
+        - name: Show kubectl version 
+          debug:
+            msg:
+            - "{{ kubectl_version.stdout }}" 
+
+        - name: Install the Calico Network Add-On - On the Control Plane Node, install Calico Networking
+          shell: kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
+
+        - name: Pause for 60 sec to build containers
+          pause:
+            seconds: 60
+
+        - name: Check Calico Networking
+          shell: kubectl get pods -l k8s-app=calico-kube-controllers -n kube-system
+          register: pod_status
+
+        - name: Validate if calico pod ran
+          fail:
+            msg:
+            - "calico pod did not run"  
+          when: "'Running' not in pod_status.stdout"
+
+        - name: create the token and copy the kubeadm join command
+          shell: kubeadm token create --print-join-command
+          register: join_token
+
+        - name: Get the token
+          debug:
+            msg:
+            - "{{ join_token.stdout }}" 
+
+        - set_fact:
+            TOKEN_COMMAND: "{{ join_token.stdout }}"
+
+      delegate_to: controller1
+      become: true
+      become_user: root
+
+    - name: Preparing to Join Worker Node 1 to Cluster
+      block:
+        - name: Join Workers to Cluster
+          shell: "sudo {{ TOKEN_COMMAND }}"        
+
+      delegate_to: worker1   
+      become: true
+      become_user: root
+
+    - name: Preparing to Join Worker Node 2  to Cluster
+      block:
+        - name: Join Workers to Cluster
+          shell: "sudo {{ TOKEN_COMMAND }}"         
+
+      delegate_to: worker2   
+      become: true
+      become_user: root
+
+    - name: Continue Runs on Controller
+      block:
+        - name: Pause for 60 sec to wait a few moments to allow the cluster to become ready
+          pause:
+            seconds: 60 
+
+        - name: Check Nodes
+          shell: kubectl get nodes
+          register: node_status
+
+        - name: Validate if calico pod ran
+          debug:
+            msg: "{{ node_status.stdout_lines }}"
+
+      delegate_to: controller1
+      become: true
+      become_user: root
