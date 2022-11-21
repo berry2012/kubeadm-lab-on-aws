@@ -159,5 +159,5 @@ ansible-playbook -i inventory -v deployment.yml
 
 *Check if the AWS CloudFormation Stack still exist to confirm deletion* 
 
->`aws cloudformation list-stacks --stack-status-filter CREATE_COMPLETE --region ${REGION} --query 'StackSummaries[*].{Name:StackName,Date:CreationTime,Status:StackStatus}' --output text | grep kubeadm`
+>```aws cloudformation list-stacks --stack-status-filter CREATE_COMPLETE --region ${REGION} --query 'StackSummaries[*].{Name:StackName,Date:CreationTime,Status:StackStatus}' --output text | grep kubeadm```
 
