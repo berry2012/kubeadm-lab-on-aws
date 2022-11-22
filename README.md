@@ -117,9 +117,7 @@ scp -i ${LOCAL_SSH_KEY_FILE} deployment.yml setup.sh ../inventory *.cfg ubuntu@$
 ```
 ssh -i ${LOCAL_SSH_KEY_FILE} ubuntu@${ANSIBLE_SERVER_PUBLIC_IP}
 
-LOCAL_SSH_KEY_FILE="~/.ssh/key.pem"  # your ssh key
-
-chmod 400 ~/.ssh/key.pem  # your ssh key
+chmod 400 ~/.ssh/key.pem  # your ssh key copied to the Ansible server
 ```
 
 
