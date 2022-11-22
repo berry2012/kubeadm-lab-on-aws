@@ -81,9 +81,11 @@ aws ec2 describe-instances --filters "Name=tag:project,Values=k8s-kubeadm" "Name
 
 ```
 - Define your Ansible server environment variable
+
 ```
-  export ANSIBLE_SERVER_PUBLIC_IP=""
+export ANSIBLE_SERVER_PUBLIC_IP="$(aws ec2 describe-instances --filters "Name=tag-value,Values=ansible_controller_kubeadm_lab" "Name=instance-state-name,Values=running" --query 'Reservations[*].Instances[*].[PublicIpAddress]' --output text --region ${REGION} --profile default)"
 ```
+Change your AWS credential if different from default.
 
 - Transfer your SSH key to the Ansible Server. This will be need in the Ansible Inventory file.
   
