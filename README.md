@@ -151,6 +151,35 @@ ansible-playbook -i inventory -v deployment.yml
 
 ```
 
+## Final Result
+
+```
+TASK [Ansible Host Kubectl Commands] **************************************************************************************************************************************************
+ok: [localhost] => {
+    "msg": [
+        "NAME             STATUS   ROLES           AGE   VERSION",
+        "k8s-controller   Ready    control-plane   40m   v1.25.4",
+        "k8s-worker1      Ready    <none>          38m   v1.25.4",
+        "k8s-worker2      Ready    <none>          38m   v1.25.4"
+    ]
+}
+
+PLAY RECAP ****************************************************************************************************************************************************************************
+localhost                  : ok=8    changed=4    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+```
+
+# Test Kubectl Commands
+```
+ubuntu@ip-10-192-10-160:~$ kubectl get nodes
+NAME             STATUS   ROLES           AGE   VERSION
+k8s-controller   Ready    control-plane   40m   v1.25.4
+k8s-worker1      Ready    <none>          38m   v1.25.4
+k8s-worker2      Ready    <none>          38m   v1.25.4
+ubuntu@ip-10-192-10-160:~$ 
+```
+
+
+
 # Clean Up
 
 *Delete the AWS CloudFormation Stack*
