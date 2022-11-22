@@ -8,16 +8,16 @@
 - [AWS Account](https://aws.amazon.com/premiumsupport/knowledge-center/create-and-activate-aws-account/)
 - [Key Pair](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/create-key-pairs.html)
 
-# Cluster Details -  3 servers
-
-- kubernetes v1.25.0 
+# Cluster Details -  4 servers
 - 1 control plane
 - 2 worker nodes
+- 1 Kubectl Client 
 
-# Specifying Kubernetes Release Version
+
+# Default Kubernetes v1.25.4. How to specifying a different Kubernetes Release Version
 
 **Update 1.XX.X-00 based on Kubernetes release version in deployments/setup.sh**
-
+**Update 1.XX.X-00 based on Kubernetes release version in deployments/deployment.yml for the Kubectl Client**
 
 ## Node Details
 - All the provisioned instances run the same OS
