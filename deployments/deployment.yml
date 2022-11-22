@@ -53,10 +53,11 @@
         - name: Set kubectl access
           shell: |
             mkdir -p $HOME/.kube
+            mkdir -p /home/ubuntu/.kube
             sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
             sudo chown $(id -u):$(id -g) $HOME/.kube/config
-            sudo cp /etc/kubernetes/admin.conf /home/ubuntu/config
-            sudo chown ubuntu:ubuntu /home/ubuntu/config     
+            sudo cp /etc/kubernetes/admin.conf /home/ubuntu/.kube/config
+            sudo chown ubuntu:ubuntu /home/ubuntu/.kube/config     
 
             exit 0
 
@@ -137,3 +138,53 @@
       delegate_to: controller1
       become: true
       become_user: root
+      
+
+# Make ANSIBLE HOST Kubeclt client
+- hosts: localhost
+  become: true
+  become_user: ubuntu
+
+  tasks:
+
+    - name: Install kubectl
+      get_url:
+        url: https://storage.googleapis.com/kubernetes-release/release/v1.25.4/bin/linux/amd64/kubectl
+        dest: /usr/local/bin/
+        mode: a+x
+      become_user: root
+      
+    - name: Get kubectl version
+      shell: kubectl version --client
+      register: kubectl_version
+
+    - name: Show kubectl version
+      debug:
+        msg:
+        - "{{ kubectl_version.stdout_lines }}"       
+
+    - name: Fetch file from remote to local
+      ansible.builtin.fetch:
+        src: /etc/kubernetes/admin.conf
+        dest: /tmp/config
+        flat: yes
+      delegate_to: controller1
+      become: true
+      become_user: root      
+
+
+    - name: Set kubectl access
+      shell: |
+        mkdir -p $HOME/.kube
+        sudo cp -i /tmp/config $HOME/.kube/config
+        sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+        exit 0
+
+    - name: Check Nodes from Ansible Host
+      shell: kubectl get nodes
+      register: node_status
+
+    - name: Ansible Host Kubectl Commands
+      debug:
+        msg: "{{ node_status.stdout_lines }}"              
