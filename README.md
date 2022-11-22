@@ -6,6 +6,7 @@
 # Pre-requisites:
 - [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) 
 - [AWS Account](https://aws.amazon.com/premiumsupport/knowledge-center/create-and-activate-aws-account/)
+- [Key Pair](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/create-key-pairs.html)
 
 # Cluster Details -  3 servers
 
@@ -55,14 +56,14 @@ git clone repo
 cd kubeadm-lab-on-aws
 
 # create the infrastructure for your stack
-aws cloudformation create-stack --stack-name kubeadm-lab --template-body file://infrastructure/k8s_aws_instances.yml --parameters ParameterKey=EnvironmentName,ParameterValue=k8s ParameterKey=KeyName,ParameterValue=key.pem --capabilities CAPABILITY_IAM --region ${REGION}
+aws cloudformation create-stack --stack-name kubeadm-lab --template-body file://infrastructure/k8s_aws_instances.yml --parameters ParameterKey=EnvironmentName,ParameterValue=k8s ParameterKey=KeyName,ParameterValue=key-pair --capabilities CAPABILITY_IAM --region ${REGION}
 
 # Check stack status for CREATE_COMPLETE. Takes about 3mins
 aws cloudformation describe-stacks --stack-name kubeadm-lab --query 'Stacks[].StackStatus' --region ${REGION}
 
 ```
 
-Note: replace `key.pem` with your key name
+Note: replace `key-pair` with your key pair already created in AWS EC2.
 
 
 ## Accessing the EC2 instances
