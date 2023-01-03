@@ -48,7 +48,8 @@
     - name: Run on Controller
       block:
         - name: Initialize the cluster
-          shell: sudo kubeadm init --pod-network-cidr 192.168.0.0/16
+          shell: |
+            sudo kubeadm init --pod-network-cidr 192.168.0.0/16
 
         - name: Set kubectl access
           shell: |
@@ -149,7 +150,7 @@
 
     - name: Install kubectl
       get_url:
-        url: https://storage.googleapis.com/kubernetes-release/release/v1.25.4/bin/linux/amd64/kubectl
+        url: https://storage.googleapis.com/kubernetes-release/release/v1.26.0/bin/linux/amd64/kubectl
         dest: /usr/local/bin/
         mode: a+x
       become_user: root
@@ -172,8 +173,29 @@
       become: true
       become_user: root      
 
+    - name: Set kubectl access on the controller for Ubuntu user
+      shell: |
+        mkdir -p $HOME/.kube
+        sudo cp /etc/kubernetes/admin.conf $HOME/.kube/config
+        sudo chown $(id -u):$(id -g) $HOME/.kube/config
 
-    - name: Set kubectl access
+        exit 0
+      delegate_to: controller1
+      become: true
+      become_user: ubuntu
+
+    - name: Setup shortcut for Kubernetes Nodes in the cluster
+      shell: |
+        touch $HOME/.ssh/config
+        sudo cp $HOME/config $HOME/.ssh/config
+        sudo chown $(id -u):$(id -g) $HOME/.ssh/config
+
+        exit 0
+      delegate_to: controller1
+      become: true
+      become_user: ubuntu
+
+    - name: Set kubectl access on the Ansible Host
       shell: |
         mkdir -p $HOME/.kube
         sudo cp -i /tmp/config $HOME/.kube/config
