@@ -95,15 +95,21 @@ Change your AWS credential if different from default.
   
 ```
 echo "scp -i ${LOCAL_SSH_KEY_FILE} ${LOCAL_SSH_KEY_FILE} ubuntu@${ANSIBLE_SERVER_PUBLIC_IP}:~/.ssh/" 
-inspect and execute the output
-```
 
+```
+Inspect and execute the output generated.
 
 - To Create inventory file. Edit the inventory.sh and update the variable SSH_KEY_FILE and REGION accordingly
 
+View the inventory file and update it according to your AWS environment setup
 ```
 vi deployments/inventory.sh
+```
+
+Proceed with the commands below:
+```
 chmod +x deployments/inventory.sh
+
 bash deployments/inventory.sh
 
 ```
