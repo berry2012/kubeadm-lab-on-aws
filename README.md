@@ -14,7 +14,8 @@
 - 1 Kubectl Client 
 
 
-#  Kubernetes v1.25.4. How to specifying a different Kubernetes Release Version
+#  Kubernetes v1.25.4 Deployment
+## How to specify a different Kubernetes Release Version
 
 **Update 1.XX.X-00 based on Kubernetes release version in deployments/setup.sh**
 **Update 1.XX.X-00 based on Kubernetes release version in deployments/deployment.yml for the Kubectl Client**
