@@ -14,10 +14,12 @@
 - 1 Kubectl Client 
 
 
-# Default Kubernetes v1.25.4. How to specifying a different Kubernetes Release Version
+# Default Kubernetes v1.26.0. How to specifying a different Kubernetes Release Version
 
 **Update 1.XX.X-00 based on Kubernetes release version in deployments/setup.sh**
 **Update 1.XX.X-00 based on Kubernetes release version in deployments/deployment.yml for the Kubectl Client**
+
+Kubernetes v1.26.0 requires contained version 1.6.X and above
 
 ## Node Details
 - All the provisioned instances run the same OS
@@ -84,7 +86,7 @@ export REGION="eu-west-1"
 aws ec2 describe-instances --filters "Name=tag:project,Values=k8s-kubeadm" "Name=instance-state-name,Values=running" --query 'Reservations[*].Instances[*].[Placement.AvailabilityZone, State.Name, InstanceId, PrivateIpAddress, PublicIpAddress, [Tags[?Key==`Name`].Value] [0][0]]' --output text --region ${REGION}
 
 ```
-- Define your Ansible server environment variable
+- Define your Ansible server environment variable. if you are using AWS profile other than default, substitue it in the commands below:
 
 ```
 export ANSIBLE_SERVER_PUBLIC_IP="$(aws ec2 describe-instances --filters "Name=tag-value,Values=ansible_controller_kubeadm_lab" "Name=instance-state-name,Values=running" --query 'Reservations[*].Instances[*].[PublicIpAddress]' --output text --region ${REGION} --profile default)"
@@ -110,8 +112,13 @@ Proceed with the commands below:
 ```
 chmod +x deployments/inventory.sh
 
-bash deployments/inventory.sh
+bash deployments/inventory.sh ${LOCAL_SSH_KEY_FILE} ${REGION}
 
+
+chmod +x deployments/config.sh 
+
+
+bash deployments/config.sh ${LOCAL_SSH_KEY_FILE} ${REGION}
 ```
 
 - Transfer all playbooks in deployments/playbooks to the ansible server
@@ -119,15 +126,18 @@ bash deployments/inventory.sh
 ```
 cd deployments
 
-scp -i ${LOCAL_SSH_KEY_FILE} deployment.yml setup.sh ../inventory *.cfg ubuntu@${ANSIBLE_SERVER_PUBLIC_IP}:~
+scp -i ${LOCAL_SSH_KEY_FILE} deployment.yml setup.sh ../inventory ../config *.cfg ubuntu@${ANSIBLE_SERVER_PUBLIC_IP}:~
 
 ```
 
 - Connect to the Ansible Server
 ```
 ssh -i ${LOCAL_SSH_KEY_FILE} ubuntu@${ANSIBLE_SERVER_PUBLIC_IP}
+```
+- Your ssh key copied to the Ansible server
 
-chmod 400 ~/.ssh/key.pem  # your ssh key copied to the Ansible server
+```
+chmod 400 ~/.ssh/key.pem  
 ```
 
 
@@ -168,9 +178,9 @@ TASK [Ansible Host Kubectl Commands] *******************************************
 ok: [localhost] => {
     "msg": [
         "NAME             STATUS   ROLES           AGE   VERSION",
-        "k8s-controller   Ready    control-plane   40m   v1.25.4",
-        "k8s-worker1      Ready    <none>          38m   v1.25.4",
-        "k8s-worker2      Ready    <none>          38m   v1.25.4"
+        "k8s-controller   Ready    control-plane   40m   v1.26.0",
+        "k8s-worker1      Ready    <none>          38m   v1.26.0",
+        "k8s-worker2      Ready    <none>          38m   v1.26.0"
     ]
 }
 
@@ -178,19 +188,26 @@ PLAY RECAP *********************************************************************
 localhost                  : ok=8    changed=4    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
 ```
 
-# Test Kubectl Commands
+# Test Kubectl Commands on the Ansible Controller Server
 ```
 ubuntu@ip-10-192-10-160:~$ kubectl get nodes
 NAME             STATUS   ROLES           AGE   VERSION
-k8s-controller   Ready    control-plane   40m   v1.25.4
-k8s-worker1      Ready    <none>          38m   v1.25.4
-k8s-worker2      Ready    <none>          38m   v1.25.4
+k8s-controller   Ready    control-plane   40m   v1.26.0
+k8s-worker1      Ready    <none>          38m   v1.26.0
+k8s-worker2      Ready    <none>          38m   v1.26.0
 ubuntu@ip-10-192-10-160:~$ 
 ```
+# Test Kubectl Commands on the Kubernetes Controller
+```
+ubuntu@ip-10-192-10-194:~$ ssh k8s-controller
 
-
-
+ubuntu@k8s-controller:~$ kubectl get nodes
+NAME             STATUS   ROLES           AGE   VERSION
+k8s-controller   Ready    control-plane   40m   v1.26.0
+k8s-worker1      Ready    <none>          39m   v1.26.0
+k8s-worker2      Ready    <none>          39m   v1.26.0
 # Clean Up
+```
 
 *Delete the AWS CloudFormation Stack*
 

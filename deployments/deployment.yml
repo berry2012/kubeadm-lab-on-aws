@@ -48,7 +48,8 @@
     - name: Run on Controller
       block:
         - name: Initialize the cluster
-          shell: sudo kubeadm init --pod-network-cidr 192.168.0.0/16
+          shell: |
+            sudo kubeadm init --pod-network-cidr 192.168.0.0/16
 
         - name: Set kubectl access
           shell: |
@@ -183,7 +184,18 @@
       become: true
       become_user: ubuntu
 
-    - name: Set kubectl access
+    - name: Setup shortcut for Kubernetes Nodes in the cluster
+      shell: |
+        touch $HOME/.ssh/config
+        sudo cp $HOME/config $HOME/.ssh/config
+        sudo chown $(id -u):$(id -g) $HOME/.ssh/config
+
+        exit 0
+      delegate_to: controller1
+      become: true
+      become_user: ubuntu
+
+    - name: Set kubectl access on the Ansible Host
       shell: |
         mkdir -p $HOME/.kube
         sudo cp -i /tmp/config $HOME/.kube/config
