@@ -54,8 +54,8 @@ EOF
 sudo apt-get update
 
 # Install Kubernetes packages of choice (Note: If you get a dpkg lock message, just wait a minute or two before trying the command again):
-# Updtae 1.25.4-00 based on Kubernetes release version
-sudo apt-get install -y kubelet=1.25.4-00 kubeadm=1.25.4-00 kubectl=1.25.4-00
+# Updtae 1.26.0-00 based on Kubernetes release version
+sudo apt-get install -y kubelet=1.26.0-00 kubeadm=1.26.0-00 kubectl=1.26.0-00
 
 # Turn off automatic updates:
 sudo apt-mark hold kubelet kubeadm kubectl

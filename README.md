@@ -55,15 +55,19 @@ git clone repo
 
 cd kubeadm-lab-on-aws
 
+# Define your environment variables e.g
+REGION=eu-west-1
+key_pair=myec2key
+
 # create the infrastructure for your stack
-aws cloudformation create-stack --stack-name kubeadm-lab --template-body file://infrastructure/k8s_aws_instances.yml --parameters ParameterKey=EnvironmentName,ParameterValue=k8s ParameterKey=KeyName,ParameterValue=key-pair --capabilities CAPABILITY_IAM --region ${REGION}
+aws cloudformation create-stack --stack-name kubeadm-lab --template-body file://infrastructure/k8s_aws_instances.yml --parameters ParameterKey=EnvironmentName,ParameterValue=k8s ParameterKey=KeyName,ParameterValue=${key_pair} --capabilities CAPABILITY_IAM --region ${REGION}
 
 # Check stack status for CREATE_COMPLETE. Takes about 3mins
 aws cloudformation describe-stacks --stack-name kubeadm-lab --query 'Stacks[].StackStatus' --region ${REGION}
 
 ```
 
-Note: replace `key-pair` with your key pair already created in AWS EC2.
+Note: replace `${key_pair}`  with your key pair already created in AWS EC2.
 
 
 ## Accessing the EC2 instances
