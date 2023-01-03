@@ -32,6 +32,7 @@ sudo containerd config default | sudo tee /etc/containerd/config.toml
 
 # Restart containerd to ensure new configuration file usage:
 sudo systemctl restart containerd
+sudo systemctl enable containerd
 
 # Disable swap:
 sudo swapoff -a
