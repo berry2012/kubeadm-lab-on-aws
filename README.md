@@ -14,12 +14,14 @@
 - 1 Kubectl Client 
 
 
-# Default Kubernetes v1.26.0. How to specifying a different Kubernetes Release Version
+# Default Kubernetes v1.26.0. 
+
+## How to specify a different Kubernetes Release Version
 
 **Update 1.XX.X-00 based on Kubernetes release version in deployments/setup.sh**
 **Update 1.XX.X-00 based on Kubernetes release version in deployments/deployment.yml for the Kubectl Client**
 
-Kubernetes v1.26.0 requires contained version 1.6.X and above
+Kubernetes v1.26.0 requires contained version 1.6.X and above. Be sure to check for all package dependencies before changing the k8s version.
 
 ## Node Details
 - All the provisioned instances run the same OS
