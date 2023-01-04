@@ -14,12 +14,14 @@
 - 1 Kubectl Client 
 
 
-# Default Kubernetes v1.26.0. How to specifying a different Kubernetes Release Version
+# Default Kubernetes v1.26.0
+
+## How to specify a different Kubernetes Release Version
 
 **Update 1.XX.X-00 based on Kubernetes release version in deployments/setup.sh**
 **Update 1.XX.X-00 based on Kubernetes release version in deployments/deployment.yml for the Kubectl Client**
 
-Kubernetes v1.26.0 requires contained version 1.6.X and above
+Kubernetes v1.26.0 requires contained version 1.6.X and above. Be sure to check for all package dependencies before changing the k8s version.
 
 ## Node Details
 - All the provisioned instances run the same OS
@@ -99,16 +101,16 @@ Change your AWS credential if different from default.
 echo "scp -i ${LOCAL_SSH_KEY_FILE} ${LOCAL_SSH_KEY_FILE} ubuntu@${ANSIBLE_SERVER_PUBLIC_IP}:~/.ssh/" 
 
 ```
-Inspect and execute the output generated.
+- Inspect and execute the output of the command generated above.
 
-- To Create inventory file. Edit the inventory.sh and update the variable SSH_KEY_FILE and REGION accordingly
+- To Create inventory file. Edit the inventory.sh and update the REGION if different from `eu-west-1`.
 
-View the inventory file and update it according to your AWS environment setup
+- View the inventory file and update it according to your AWS environment setup
 ```
 vi deployments/inventory.sh
 ```
 
-Proceed with the commands below:
+- Proceed with the commands below:
 ```
 chmod +x deployments/inventory.sh
 
@@ -188,7 +190,7 @@ PLAY RECAP *********************************************************************
 localhost                  : ok=8    changed=4    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
 ```
 
-# Test Kubectl Commands on the Ansible Controller Server
+## Test Kubectl Commands on the Ansible Controller Server
 ```
 ubuntu@ip-10-192-10-160:~$ kubectl get nodes
 NAME             STATUS   ROLES           AGE   VERSION
@@ -197,7 +199,7 @@ k8s-worker1      Ready    <none>          38m   v1.26.0
 k8s-worker2      Ready    <none>          38m   v1.26.0
 ubuntu@ip-10-192-10-160:~$ 
 ```
-# Test Kubectl Commands on the Kubernetes Controller
+## Test Kubectl Commands on the Kubernetes Controller
 ```
 ubuntu@ip-10-192-10-194:~$ ssh k8s-controller
 
@@ -206,9 +208,10 @@ NAME             STATUS   ROLES           AGE   VERSION
 k8s-controller   Ready    control-plane   40m   v1.26.0
 k8s-worker1      Ready    <none>          39m   v1.26.0
 k8s-worker2      Ready    <none>          39m   v1.26.0
-# Clean Up
+
 ```
 
+# Clean Up
 *Delete the AWS CloudFormation Stack*
 
 >`aws cloudformation delete-stack --stack-name kubeadm-lab`
@@ -216,5 +219,7 @@ k8s-worker2      Ready    <none>          39m   v1.26.0
 
 *Check if the AWS CloudFormation Stack still exist to confirm deletion* 
 
->```aws cloudformation list-stacks --stack-status-filter DELETE_COMPLETE --region ${REGION} --query 'StackSummaries[*].{Name:StackName,Date:CreationTime,Status:StackStatus}' --output text | grep kubeadm```
+```
+aws cloudformation list-stacks --stack-status-filter DELETE_COMPLETE --region ${REGION} --query 'StackSummaries[*].{Name:StackName,Date:CreationTime,Status:StackStatus}' --output text | grep kubeadm
+```
 

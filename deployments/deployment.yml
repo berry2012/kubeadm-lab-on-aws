@@ -201,7 +201,16 @@
         sudo cp -i /tmp/config $HOME/.kube/config
         sudo chown $(id -u):$(id -g) $HOME/.kube/config
 
-        exit 0
+        exit 0     
+        
+    - name: set hostname on the Ansible Host
+      shell: "sudo hostnamectl set-hostname ansible-controller"
+      
+    - name: reboot
+      reboot:
+
+    - pause:
+        seconds: 30       
 
     - name: Check Nodes from Ansible Host
       shell: kubectl get nodes
@@ -209,4 +218,4 @@
 
     - name: Ansible Host Kubectl Commands
       debug:
-        msg: "{{ node_status.stdout_lines }}"              
+        msg: "{{ node_status.stdout_lines }}"
