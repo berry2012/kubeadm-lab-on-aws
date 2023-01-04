@@ -103,7 +103,7 @@ echo "scp -i ${LOCAL_SSH_KEY_FILE} ${LOCAL_SSH_KEY_FILE} ubuntu@${ANSIBLE_SERVER
 ```
 - Inspect and execute the output of the command generated above.
 
-- To Create inventory file. Edit the inventory.sh and update the variable SSH_KEY_FILE and REGION accordingly
+- To Create inventory file. Edit the inventory.sh and update the REGION if different from `eu-west-1`.
 
 - View the inventory file and update it according to your AWS environment setup
 ```
