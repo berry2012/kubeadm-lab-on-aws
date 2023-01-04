@@ -14,7 +14,7 @@
 - 1 Kubectl Client 
 
 
-# Default Kubernetes v1.26.0. 
+# Default Kubernetes v1.26.0
 
 ## How to specify a different Kubernetes Release Version
 
@@ -190,7 +190,7 @@ PLAY RECAP *********************************************************************
 localhost                  : ok=8    changed=4    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
 ```
 
-# Test Kubectl Commands on the Ansible Controller Server
+## Test Kubectl Commands on the Ansible Controller Server
 ```
 ubuntu@ip-10-192-10-160:~$ kubectl get nodes
 NAME             STATUS   ROLES           AGE   VERSION
@@ -199,7 +199,7 @@ k8s-worker1      Ready    <none>          38m   v1.26.0
 k8s-worker2      Ready    <none>          38m   v1.26.0
 ubuntu@ip-10-192-10-160:~$ 
 ```
-# Test Kubectl Commands on the Kubernetes Controller
+## Test Kubectl Commands on the Kubernetes Controller
 ```
 ubuntu@ip-10-192-10-194:~$ ssh k8s-controller
 
@@ -208,9 +208,10 @@ NAME             STATUS   ROLES           AGE   VERSION
 k8s-controller   Ready    control-plane   40m   v1.26.0
 k8s-worker1      Ready    <none>          39m   v1.26.0
 k8s-worker2      Ready    <none>          39m   v1.26.0
-# Clean Up
+
 ```
 
+# Clean Up
 *Delete the AWS CloudFormation Stack*
 
 >`aws cloudformation delete-stack --stack-name kubeadm-lab`
@@ -218,5 +219,7 @@ k8s-worker2      Ready    <none>          39m   v1.26.0
 
 *Check if the AWS CloudFormation Stack still exist to confirm deletion* 
 
->```aws cloudformation list-stacks --stack-status-filter DELETE_COMPLETE --region ${REGION} --query 'StackSummaries[*].{Name:StackName,Date:CreationTime,Status:StackStatus}' --output text | grep kubeadm```
+```
+aws cloudformation list-stacks --stack-status-filter DELETE_COMPLETE --region ${REGION} --query 'StackSummaries[*].{Name:StackName,Date:CreationTime,Status:StackStatus}' --output text | grep kubeadm
+```
 
