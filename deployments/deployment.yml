@@ -200,6 +200,9 @@
         mkdir -p $HOME/.kube
         sudo cp -i /tmp/config $HOME/.kube/config
         sudo chown $(id -u):$(id -g) $HOME/.kube/config
+        touch $HOME/.ssh/config        
+        sudo cp $HOME/config $HOME/.ssh/config
+        sudo chown $(id -u):$(id -g) $HOME/.ssh/config
 
         exit 0     
         
@@ -214,3 +217,7 @@
     - name: Ansible Host Kubectl Commands
       debug:
         msg: "{{ node_status.stdout_lines }}"
+
+    - name: How to Access the cluster
+      debug:
+        msg: "SSH into the Ansible server and run kubectl commands"
