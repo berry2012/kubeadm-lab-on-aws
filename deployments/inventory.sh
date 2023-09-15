@@ -5,8 +5,7 @@ if [ "$#" != "2" ]; then
  exit 300
 fi
 
-REGION=eu-west-1 # update this with your AWS environment
-# LOCAL_SSH_KEY_FILE="~/.ssh/aws-wale.pem"  # update this with your key
+REGION=$2 
 
 # get environment variables 
 WORKER1_PRIVATE_IP=$(aws ec2 describe-instances --filters "Name=tag-value,Values=worker1" "Name=instance-state-name,Values=running" --query 'Reservations[*].Instances[*].[PrivateIpAddress]' --output text --region ${REGION} --profile ${AWS_PROFILE})    
