@@ -180,12 +180,12 @@ ansible-playbook -i inventory -v deployment.yml
 
 ```
 TASK [Ansible Host Kubectl Commands] **************************************************************************************************************************************************
-ok: [localhost] => {
+ok: [localhost -> 10.192.10.133] => {
     "msg": [
-        "NAME             STATUS   ROLES           AGE   VERSION",
-        "k8s-controller   Ready    control-plane   40m   v1.26.0",
-        "k8s-worker1      Ready    <none>          38m   v1.26.0",
-        "k8s-worker2      Ready    <none>          38m   v1.26.0"
+        "NAME             STATUS   ROLES           AGE     VERSION",
+        "k8s-controller   Ready    control-plane   2m22s   v1.27.5",
+        "k8s-worker1      Ready    <none>          66s     v1.27.5",
+        "k8s-worker2      Ready    <none>          62s     v1.27.5"
     ]
 }
 
@@ -196,10 +196,10 @@ localhost                  : ok=8    changed=4    unreachable=0    failed=0    s
 ## Test Kubectl Commands on the Ansible Controller Server
 ```
 ubuntu@ip-10-192-10-160:~$ kubectl get nodes
-NAME             STATUS   ROLES           AGE   VERSION
-k8s-controller   Ready    control-plane   40m   v1.26.0
-k8s-worker1      Ready    <none>          38m   v1.26.0
-k8s-worker2      Ready    <none>          38m   v1.26.0
+NAME             STATUS   ROLES           AGE     VERSION
+k8s-controller   Ready    control-plane   7m41s   v1.27.5
+k8s-worker1      Ready    <none>          6m25s   v1.27.5
+k8s-worker2      Ready    <none>          6m21s   v1.27.5
 ubuntu@ip-10-192-10-160:~$ 
 ```
 ## Test Kubectl Commands on the Kubernetes Controller
@@ -207,10 +207,10 @@ ubuntu@ip-10-192-10-160:~$
 ubuntu@ip-10-192-10-194:~$ ssh k8s-controller
 
 ubuntu@k8s-controller:~$ kubectl get nodes
-NAME             STATUS   ROLES           AGE   VERSION
-k8s-controller   Ready    control-plane   40m   v1.26.0
-k8s-worker1      Ready    <none>          39m   v1.26.0
-k8s-worker2      Ready    <none>          39m   v1.26.0
+NAME             STATUS   ROLES           AGE     VERSION
+k8s-controller   Ready    control-plane   7m41s   v1.27.5
+k8s-worker1      Ready    <none>          6m25s   v1.27.5
+k8s-worker2      Ready    <none>          6m21s   v1.27.5
 
 ```
 
