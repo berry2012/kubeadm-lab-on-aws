@@ -150,7 +150,7 @@
 
     - name: Install kubectl
       get_url:
-        url: https://storage.googleapis.com/kubernetes-release/release/v1.26.0/bin/linux/amd64/kubectl
+        url: https://storage.googleapis.com/kubernetes-release/release/v1.27.5/bin/linux/amd64/kubectl
         dest: /usr/local/bin/
         mode: a+x
       become_user: root
