@@ -14,14 +14,14 @@
 - 1 Kubectl Client 
 
 
-# Default Kubernetes v1.26.0
+# Default Kubernetes v1.27.5 
 
 ## How to specify a different Kubernetes Release Version
 
 **Update 1.XX.X-00 based on Kubernetes release version in deployments/setup.sh**
 **Update 1.XX.X-00 based on Kubernetes release version in deployments/deployment.yml for the Kubectl Client**
 
-Kubernetes v1.26.0 requires contained version 1.6.X and above. Be sure to check for all package dependencies before changing the k8s version.
+E.g. Kubernetes v1.26.0 requires contained version 1.6.X and above. Be sure to check for all package dependencies before changing the k8s version.
 
 ## Node Details
 - All the provisioned instances run the same OS
@@ -64,11 +64,12 @@ REGION=eu-west-1
 key_pair=myec2key
 
 # create the infrastructure for your stack
-aws cloudformation create-stack --stack-name kubeadm-lab --template-body file://infrastructure/k8s_aws_instances.yml --parameters ParameterKey=EnvironmentName,ParameterValue=k8s ParameterKey=KeyName,ParameterValue=${key_pair} --capabilities CAPABILITY_IAM --region ${REGION}
+aws cloudformation create-stack --stack-name kubeadm-lab --template-body file://infrastructure/k8s_aws_instances.yml --parameters ParameterKey=EnvironmentName,ParameterValue=k8s ParameterKey=KeyName,ParameterValue=${key_pair} --capabilities CAPABILITY_NAMED_IAM --region ${REGION}
 
 # Check stack status for CREATE_COMPLETE. Takes about 3mins
-aws cloudformation describe-stacks --stack-name kubeadm-lab --query 'Stacks[].StackStatus' --region ${REGION}
+aws cloudformation describe-stacks --stack-name kubeadm-lab --query 'Stacks[].StackStatus' --region ${REGION} --output text
 
+aws cloudformation wait stack-create-complete --stack-name kubeadm-lab
 ```
 
 Note: replace `${key_pair}`  with your key pair already created in AWS EC2.
@@ -79,7 +80,10 @@ Note: replace `${key_pair}`  with your key pair already created in AWS EC2.
 ```
 export LOCAL_SSH_KEY_FILE="~/.ssh/key.pem"
 export REGION="eu-west-1"
+export AWS_PROFILE="work"
 ```
+
+**Note: By default, the AWS CLI uses the settings found in the profile named default. To use alternate settings, you can [create and reference additional profiles](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html).**
 
 ## Setting up for deployments
 - Confirm the instances created and the Public IP of the Ansible controller server
@@ -91,9 +95,8 @@ aws ec2 describe-instances --filters "Name=tag:project,Values=k8s-kubeadm" "Name
 - Define your Ansible server environment variable. if you are using AWS profile other than default, substitue it in the commands below:
 
 ```
-export ANSIBLE_SERVER_PUBLIC_IP="$(aws ec2 describe-instances --filters "Name=tag-value,Values=ansible_controller_kubeadm_lab" "Name=instance-state-name,Values=running" --query 'Reservations[*].Instances[*].[PublicIpAddress]' --output text --region ${REGION} --profile default)"
+export ANSIBLE_SERVER_PUBLIC_IP="$(aws ec2 describe-instances --filters "Name=tag-value,Values=ansible_controller_kubeadm_lab" "Name=instance-state-name,Values=running" --query 'Reservations[*].Instances[*].[PublicIpAddress]' --output text --region ${REGION} --profile ${AWS_PROFILE})"
 ```
-Change your AWS credential if different from default.
 
 - Transfer your SSH key to the Ansible Server. This will be need in the Ansible Inventory file.
   
