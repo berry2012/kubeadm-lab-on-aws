@@ -58,25 +58,38 @@ UBUNTU_CODENAME=focal
 git clone repo
 
 cd kubeadm-lab-on-aws
+```
 
-# Define your environment variables e.g
-REGION=eu-west-1
-key_pair=myec2key
+### Define your environment variables e.g
 
-# create the infrastructure for your stack
+```
+export REGION="eu-west-1"
+export key_pair="my-EC2-key-name"
+```
+
+**Note: key_pair is your key pair and should already be created in AWS EC2.**
+
+## create the infrastructure for your stack
+
+```
 aws cloudformation create-stack --stack-name kubeadm-lab --template-body file://infrastructure/k8s_aws_instances.yml --parameters ParameterKey=EnvironmentName,ParameterValue=k8s ParameterKey=KeyName,ParameterValue=${key_pair} --capabilities CAPABILITY_NAMED_IAM --region ${REGION}
 
-# Check stack status for CREATE_COMPLETE. Takes about 3mins
+```
+
+## Check stack status for CREATE_COMPLETE. Takes about 3mins
+
+```
 aws cloudformation describe-stacks --stack-name kubeadm-lab --query 'Stacks[].StackStatus' --region ${REGION} --output text
 
 aws cloudformation wait stack-create-complete --stack-name kubeadm-lab
 ```
 
-Note: replace `${key_pair}`  with your key pair already created in AWS EC2.
+
 
 
 ## Accessing the EC2 instances
 - Define your global variables
+
 ```
 export LOCAL_SSH_KEY_FILE="~/.ssh/key.pem"
 export REGION="eu-west-1"
@@ -142,7 +155,7 @@ ssh -i ${LOCAL_SSH_KEY_FILE} ubuntu@${ANSIBLE_SERVER_PUBLIC_IP}
 - Your ssh key copied to the Ansible server
 
 ```
-chmod 400 ~/.ssh/key.pem  
+chmod 400 ~/.ssh/key_name.pem  
 ```
 
 
