@@ -45,7 +45,7 @@ sudo swapoff -a
 sudo sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
 
 # Install dependency packages:
-sudo apt-get update && sudo apt-get install -y apt-transport-https curl
+sudo apt-get update && sudo apt-get install -y apt-transport-https ca-certificates curl gpg
 
 # Download and add GPG key:
 curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
@@ -58,9 +58,12 @@ EOF
 # Update package listings:
 sudo apt-get update
 
+#Determine which version to upgrade to
+sudo apt-cache madison kubeadm
+
 # Install Kubernetes packages of choice (Note: If you get a dpkg lock message, just wait a minute or two before trying the command again):
-# Updtae 1.27.5-00 based on Kubernetes release version
-sudo apt-get install -y kubelet=1.27.5-00 kubeadm=1.27.5-00 kubectl=1.27.5-00
+# Updtae 1.28.2-00 based on Kubernetes release version
+sudo apt-get install -y kubelet=1.28.2-00 kubeadm=1.28.2-00 kubectl=1.28.2-00
 
 # Turn off automatic updates:
 sudo apt-mark hold kubelet kubeadm kubectl
