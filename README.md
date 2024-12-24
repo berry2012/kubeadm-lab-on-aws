@@ -16,15 +16,7 @@
 
 ## Default Kubernetes Version
 
-v1.28.2
-
-## How to specify a different Kubernetes Release Version
-
-Be sure to check for all package dependencies before changing the k8s version.
-E.g. Kubernetes v1.26.0 requires contained version 1.6.X and above.
-
-- Update 1.XX.X-00 based on Kubernetes release version in `deployments/setup.sh`
-- Update 1.XX.X-00 based on Kubernetes release version in `deployments/deployment.yml` for the Kubectl Client
+v1.31
 
 ## Node Details
 
@@ -98,9 +90,8 @@ aws cloudformation wait stack-create-complete --stack-name kubeadm-lab
 - Define your global variables
 
 ```bash
-export LOCAL_SSH_KEY_FILE="~/.ssh/key.pem"
+export LOCAL_SSH_KEY_FILE="~/.ssh/my-EC2-key-name.pem"
 export REGION="eu-west-1"
-export AWS_PROFILE="work"
 ```
 
 **Note: By default, the AWS CLI uses the settings found in the profile named default. To use alternate settings, you can [create and reference additional profiles](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html).**
@@ -114,7 +105,7 @@ aws ec2 describe-instances --filters "Name=tag:project,Values=k8s-kubeadm" "Name
 - Define your Ansible server environment variable. if you are using AWS profile other than default, substitue it in the commands below:
 
 ```bash
-export ANSIBLE_SERVER_PUBLIC_IP="$(aws ec2 describe-instances --filters "Name=tag-value,Values=ansible_controller_kubeadm_lab" "Name=instance-state-name,Values=running" --query 'Reservations[*].Instances[*].[PublicIpAddress]' --output text --region ${REGION} --profile ${AWS_PROFILE})"
+export ANSIBLE_SERVER_PUBLIC_IP="$(aws ec2 describe-instances --filters "Name=tag-value,Values=ansible_controller_kubeadm_lab" "Name=instance-state-name,Values=running" --query 'Reservations[*].Instances[*].[PublicIpAddress]' --output text --region ${REGION})"
 ```
 
 - Transfer your SSH key to the Ansible Server. This will be need in the Ansible Inventory file.
@@ -123,7 +114,11 @@ export ANSIBLE_SERVER_PUBLIC_IP="$(aws ec2 describe-instances --filters "Name=ta
 echo "scp -i ${LOCAL_SSH_KEY_FILE} ${LOCAL_SSH_KEY_FILE} ubuntu@${ANSIBLE_SERVER_PUBLIC_IP}:~/.ssh/" 
 ```
 
-- Inspect and execute the output of the command generated above.
+- Inspect and execute the output of the command generated above. Replace **my-EC2-key-name.pem** with your own values
+
+```bash
+scp -i ~/.ssh/my-EC2-key-name.pem ~/.ssh/my-EC2-key-name.pem ubuntu@XX.XX.XX.XX:~/.ssh/
+```
 
 - To Create inventory file. Edit the inventory.sh and update the REGION if different from `eu-west-1`.
 
@@ -194,40 +189,38 @@ ansible-playbook -i inventory -v deployment.yml
 ## Final Result
 
 ```bash
-TASK [Ansible Host Kubectl Commands] **************************************************************************************************************************************************
+TASK [Ansible Host Kubectl Commands] *********************************************************************************************************************************************************************************************************************************************************************
 ok: [localhost] => {
     "msg": [
         "NAME             STATUS   ROLES           AGE     VERSION",
-        "k8s-controller   Ready    control-plane   2m28s   v1.28.2",
-        "k8s-worker1      Ready    <none>          75s     v1.28.2",
-        "k8s-worker2      Ready    <none>          70s     v1.28.2"
+        "k8s-controller   Ready    control-plane   2m26s   v1.31.4",
+        "k8s-worker1      Ready    <none>          73s     v1.31.4",
+        "k8s-worker2      Ready    <none>          69s     v1.31.4"
     ]
 }
-
-PLAY RECAP ****************************************************************************************************************************************************************************
-localhost                  : ok=8    changed=4    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+ 
 ```
 
 ## Test Kubectl Commands on the Ansible Controller Server
 
 ```bash
-ubuntu@ip-10-192-10-160:~$ kubectl get nodes
+ubuntu@ip-10-192-10-189:~$ kubectl get nodes
 NAME             STATUS   ROLES           AGE     VERSION
-k8s-controller   Ready    control-plane   4m3s    v1.28.2
-k8s-worker1      Ready    <none>          2m50s   v1.28.2
-k8s-worker2      Ready    <none>          2m45s   v1.28.2
+k8s-controller   Ready    control-plane   3m19s   v1.31.4
+k8s-worker1      Ready    <none>          2m6s    v1.31.4
+k8s-worker2      Ready    <none>          2m2s    v1.31.4
 ```
 
 ## Test Kubectl Commands on the Kubernetes Controller
 
 ```bash
-ubuntu@ip-10-192-10-194:~$ ssh k8s-controller
+ubuntu@ip-10-192-10-189:~$ ssh k8s-controller
 
 ubuntu@k8s-controller:~$ kubectl get nodes
 NAME             STATUS   ROLES           AGE     VERSION
-k8s-controller   Ready    control-plane   4m3s    v1.28.2
-k8s-worker1      Ready    <none>          2m50s   v1.28.2
-k8s-worker2      Ready    <none>          2m45s   v1.28.2
+k8s-controller   Ready    control-plane   5m16s   v1.31.4
+k8s-worker1      Ready    <none>          4m3s    v1.31.4
+k8s-worker2      Ready    <none>          3m59s   v1.31.4
 ```
 
 ## Clean Up
