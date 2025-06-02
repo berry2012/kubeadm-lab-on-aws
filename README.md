@@ -1,9 +1,11 @@
 # Kubeadm-lab-on-aws
+
 **Setup Kubernetes Lab on AWS for CKA, CKAD, CKS Exam or Kubernetes Practise**
 
-*This is K8s Lab - CKA, CKAD, and CKS Exam*
+**This is K8s Lab - CKA, CKAD, and CKS Exam**
 
-# Pre-requisites:
+## Pre-requisites
+
 - [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) 
 - [AWS Account](https://aws.amazon.com/premiumsupport/knowledge-center/create-and-activate-aws-account/)
 - [Key Pair](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/create-key-pairs.html)
@@ -16,7 +18,7 @@
 
 ## Default Kubernetes Version
 
-v1.31
+v1.33 
 
 ## Node Details
 
@@ -67,9 +69,13 @@ cd kubeadm-lab-on-aws
 ```bash
 export REGION="eu-west-1"
 export key_pair="my-EC2-key-name"
+export LOCAL_SSH_KEY_FILE="~/.ssh/my-EC2-key-name.pem"
+export AWS_PROFILE=default   # you may change to your own
 ```
 
 **Note: key_pair is your key pair and should already be created in AWS EC2.**
+
+**Note: By default, the AWS CLI uses the settings found in the profile named default. To use alternate settings, you can [create and reference additional profiles](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html).**
 
 - Create the infrastructure for your stack
 
@@ -86,15 +92,6 @@ aws cloudformation wait stack-create-complete --stack-name kubeadm-lab
 ```
 
 ## Step 2: Configuring the environment
-
-- Define your global variables
-
-```bash
-export LOCAL_SSH_KEY_FILE="~/.ssh/my-EC2-key-name.pem"
-export REGION="eu-west-1"
-```
-
-**Note: By default, the AWS CLI uses the settings found in the profile named default. To use alternate settings, you can [create and reference additional profiles](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html).**
 
 - Confirm the instances created and the Public IP of the Ansible controller server
 
@@ -189,13 +186,13 @@ ansible-playbook -i inventory -v deployment.yml
 ## Final Result
 
 ```bash
-TASK [Ansible Host Kubectl Commands] *********************************************************************************************************************************************************************************************************************************************************************
+TASK [Ansible Host Kubectl Commands] ***********************************************************************************************************
 ok: [localhost] => {
     "msg": [
         "NAME             STATUS   ROLES           AGE     VERSION",
-        "k8s-controller   Ready    control-plane   2m26s   v1.31.4",
-        "k8s-worker1      Ready    <none>          73s     v1.31.4",
-        "k8s-worker2      Ready    <none>          69s     v1.31.4"
+        "k8s-controller   Ready    control-plane   2m21s   v1.33.1",
+        "k8s-worker1      Ready    <none>          72s     v1.33.1",
+        "k8s-worker2      Ready    <none>          70s     v1.33.1"
     ]
 }
  
@@ -204,23 +201,23 @@ ok: [localhost] => {
 ## Test Kubectl Commands on the Ansible Controller Server
 
 ```bash
-ubuntu@ip-10-192-10-189:~$ kubectl get nodes
+ubuntu@ip-10-192-10-248:~$ kubectl get nodes
 NAME             STATUS   ROLES           AGE     VERSION
-k8s-controller   Ready    control-plane   3m19s   v1.31.4
-k8s-worker1      Ready    <none>          2m6s    v1.31.4
-k8s-worker2      Ready    <none>          2m2s    v1.31.4
+k8s-controller   Ready    control-plane   5m55s   v1.33.1
+k8s-worker1      Ready    <none>          4m46s   v1.33.1
+k8s-worker2      Ready    <none>          4m44s   v1.33.1
 ```
 
 ## Test Kubectl Commands on the Kubernetes Controller
 
 ```bash
-ubuntu@ip-10-192-10-189:~$ ssh k8s-controller
+ubuntu@ip-10-192-10-248:~$ ssh k8s-controller
 
 ubuntu@k8s-controller:~$ kubectl get nodes
 NAME             STATUS   ROLES           AGE     VERSION
-k8s-controller   Ready    control-plane   5m16s   v1.31.4
-k8s-worker1      Ready    <none>          4m3s    v1.31.4
-k8s-worker2      Ready    <none>          3m59s   v1.31.4
+k8s-controller   Ready    control-plane   6m24s   v1.33.1
+k8s-worker1      Ready    <none>          5m15s   v1.33.1
+k8s-worker2      Ready    <none>          5m13s   v1.33.1
 ```
 
 ## Clean Up
@@ -230,7 +227,6 @@ To Delete the AWS CloudFormation Stack
 ```bash
 aws cloudformation delete-stack --stack-name kubeadm-lab
 ```
-
 
 Check if the AWS CloudFormation Stack still exist to confirm deletion
 
