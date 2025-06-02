@@ -220,6 +220,36 @@ k8s-worker1      Ready    <none>          5m15s   v1.33.1
 k8s-worker2      Ready    <none>          5m13s   v1.33.1
 ```
 
+## Deploy Sample Workloads
+
+In this example, we will install [Metrics Server](https://github.com/kubernetes-sigs/metrics-server#readme) directly from YAML manifest. If container in the pod doesn't pass readiness probe due to TLS, add `--kubelet-insecure-tls` - Do not verify the CA of serving certificates presented by Kubelets. For testing purposes only.
+
+```bash
+ubuntu@ansible-controller:~$ kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+```
+
+## View all the pods running in the cluster
+
+```bash
+ubuntu@ansible-controller:~$ kubectl get pods -A
+NAMESPACE     NAME                                       READY   STATUS    RESTARTS   AGE
+default       cpu-monitor                                1/1     Running   0          8m26s
+kube-system   calico-kube-controllers-7498b9bb4c-ff86x   1/1     Running   0          28m
+kube-system   calico-node-hqhkm                          1/1     Running   0          28m
+kube-system   calico-node-pbdw6                          1/1     Running   0          27m
+kube-system   calico-node-zj89r                          1/1     Running   0          27m
+kube-system   coredns-674b8bbfcf-btpkd                   1/1     Running   0          28m
+kube-system   coredns-674b8bbfcf-wnbvr                   1/1     Running   0          28m
+kube-system   etcd-k8s-controller                        1/1     Running   0          28m
+kube-system   kube-apiserver-k8s-controller              1/1     Running   0          28m
+kube-system   kube-controller-manager-k8s-controller     1/1     Running   0          28m
+kube-system   kube-proxy-8fngx                           1/1     Running   0          27m
+kube-system   kube-proxy-sp4zn                           1/1     Running   0          28m
+kube-system   kube-proxy-tnnxz                           1/1     Running   0          27m
+kube-system   kube-scheduler-k8s-controller              1/1     Running   0          28m
+kube-system   metrics-server-6f7dd4c4c4-nfqcg            1/1     Running   0          4m50s
+```
+
 ## Clean Up
 
 To Delete the AWS CloudFormation Stack
