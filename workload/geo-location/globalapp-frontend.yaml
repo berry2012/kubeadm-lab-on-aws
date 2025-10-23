@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: globalapp
+  namespace: geo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: globalapp
+  template:
+    metadata:
+      labels:
+        app: globalapp
+    spec:
+      containers:
+      - name: globalapp
+        image: nginx
+        ports:
+        - containerPort: 80
+        env:
+        - name: SOUTH_SERVICE_URL
+          value: "http://south.geo.svc.cluster.local"
+        - name: NORTH_SERVICE_URL
+          value: "http://north.geo.svc.cluster.local"
+        command: ["/bin/sh"]
+        args:
+        - -c
+        - |
+          cp /etc/nginx/conf.d/nginx.conf /etc/nginx/nginx.conf &&
+          cp /usr/share/nginx/html-config/index.html /usr/share/nginx/html/index.html &&
+          nginx -g 'daemon on;' &&
+          while true; do
+            echo "$(date): Testing South Service"
+            curl -s $SOUTH_SERVICE_URL || echo "South service unavailable"
+            echo "$(date): Testing North Service"  
+            curl -s $NORTH_SERVICE_URL || echo "North service unavailable"
+            sleep 30
+          done
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+          limits:
+            memory: "128Mi"
+            cpu: "100m"
+        volumeMounts:
+        - name: nginx-config
+          mountPath: /etc/nginx/conf.d
+        - name: html-config
+          mountPath: /usr/share/nginx/html-config
+      volumes:
+      - name: nginx-config
+        configMap:
+          name: nginx-proxy-config
+      - name: html-config
+        configMap:
+          name: nginx-proxy-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: globalapp
+  namespace: geo
+spec:
+  selector:
+    app: globalapp
+  ports:
+  - port: 80
+    targetPort: 80
+    nodePort: 30090
+  type: NodePort

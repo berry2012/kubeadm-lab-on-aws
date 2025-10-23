@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: game-api
+spec:
+  serviceName: game-api
+  replicas: 1
+  selector:
+    matchLabels:
+      app: game-api
+  template:
+    metadata:
+      labels:
+        app: game-api
+    spec:
+      os: { name: linux }
+      nodeSelector:
+        kubernetes.io/os: linux
+      containers:
+      - name: game-api
+        image: registry.k8s.io/test-webserver
+        volumeMounts:
+        - mountPath: /tmp
+          name: game-api-volume
+          readOnly: true
+      volumes:
+      - name: game-api-volume
+        hostPath:
+          path: /tmp
+          type: Directory
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: game-api
+spec:
+  clusterIP: None
+  selector:
+    app: game-api

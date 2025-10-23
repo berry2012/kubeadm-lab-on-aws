@@ -1,0 +1,75 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: south-html
+  namespace: geo
+data:
+  index.html: |
+    <!DOCTYPE html>
+    <html>
+    <head>
+    <title>South Service</title>
+    <style>
+    html { color-scheme: light dark; }
+    body { width: 35em; margin: 0 auto;
+    font-family: Tahoma, Verdana, Arial, sans-serif; }
+    </style>
+    </head>
+    <body>
+    <h1>South Service</h1>
+    <p>Location: Southern Region</p>
+    </body>
+    </html>
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: south
+  namespace: geo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: south
+  template:
+    metadata:
+      labels:
+        app: south
+    spec:
+      containers:
+      - name: south
+        image: nginx
+        ports:
+        - containerPort: 80
+        env:
+        - name: NORTH_SERVICE_URL
+          value: "http://north.geo.svc.cluster.local"
+        - name: GLOBALAPP_SERVICE_URL
+          value: "http://globalapp.geo.svc.cluster.local"
+        resources:
+          requests:
+            memory: "32Mi"
+            cpu: "25m"
+          limits:
+            memory: "64Mi"
+            cpu: "50m"
+        volumeMounts:
+        - name: html-content
+          mountPath: /usr/share/nginx/html
+      volumes:
+      - name: html-content
+        configMap:
+          name: south-html
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: south
+  namespace: geo
+spec:
+  selector:
+    app: south
+  ports:
+  - port: 80
+    targetPort: 80
+  type: ClusterIP

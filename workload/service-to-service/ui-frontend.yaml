@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bank-ui
+  namespace: bankapp
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: bank-ui
+  template:
+    metadata:
+      labels:
+        app: bank-ui
+    spec:
+      containers:
+      - name: bank-ui
+        image: nginx
+        ports:
+        - containerPort: 80
+        env:
+        - name: BACKEND_URL
+          value: "http://bank-api-service.bankapp.svc.cluster.local"
+        command: ["/bin/sh"]
+        args:
+        - -c
+        - |
+          nginx -g 'daemon on;' && 
+          while true; do 
+            echo "$(date): Calling backend at $BACKEND_URL"
+            curl -s $BACKEND_URL || echo "Backend call failed"
+            sleep 10
+          done
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+          limits:
+            memory: "128Mi"
+            cpu: "100m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: bank-ui-service
+  namespace: bankapp
+spec:
+  selector:
+    app: bank-ui
+  ports:
+  - port: 80
+    targetPort: 80
+  type: ClusterIP
